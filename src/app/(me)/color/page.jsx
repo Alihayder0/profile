@@ -1,4 +1,5 @@
 "use client";
+import Loading from "C:/Users/pc/Desktop/program/pro2/src/app/loading.jsx"; // تأكد من المسار صحيح
 import { useTheme } from "C:/Users/pc/Desktop/program/pro2/src/app/themeprovider.jsx"; // تأكد من المسار صحيح
 
 export default function Page() {
@@ -15,6 +16,9 @@ export default function Page() {
 
   <h1 className="mt-8 text-3xl font-bold">مرحبا بك في الوضع {theme}</h1>
   <p>هنا يمكنك رؤية التبديل بين الوضع الفاتح والداكن بشكل بسيط جداً.</p>
+
+
+  <Loading /> 
 </div>
 
   );

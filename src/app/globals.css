@@ -2,36 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
-
+/* --- Light Theme (Modern & Clean) --- */
 .light {
-  --background: 255 255 255;
-  --foreground: 23 23 23;
-  --border: 229 231 235;
-  --card-bg: 249 250 251;
-  --primary: 37 99 235;
-  --primary-hover: 29 78 216;
-  --secondary: 241 245 249;
-  --button-bg: 37 99 235;
+  --background: 249 250 251; /* Off-white */
+  --foreground: 17 24 39;     /* Charcoal Black */
+  --border: 209 213 219;     /* Gray-300 */
+  --card-bg: 255 255 255;    /* Pure White */
+  --primary: 5 150 105;       /* Emerald Green */
+  --primary-hover: 4 120 87;  /* Darker Emerald */
+  --secondary: 243 244 246;    /* Light Gray */
+  --button-bg: 5 150 105;
   --button-text: 255 255 255;
-  --link: 37 99 235;
-  --link-hover: 29 78 216;
+  --link: 5 150 105;
+  --link-hover: 4 120 87;
 }
 
-
+/* --- Dark Theme (Your Preferred Strong Blue) --- */
 .dark {
   --background: 10 10 10;
   --foreground: 237 237 237;
-  --border: 35 39 47;
+  --border: 55 65 81;      /* Gray-700 */
   --card-bg: 24 24 27;
-  --primary: 96 165 250;
-  --primary-hover: 59 130 246;
-  --secondary: 35 39 47;
-  --button-bg: 96 165 250;
+  --primary: 59 130 246;   /* The Strong Blue you liked */
+  --primary-hover: 37 99 235;
+  --secondary: 31 41 55;   /* Gray-800 */
+  --button-bg: 59 130 246;
   --button-text: 255 255 255;
-  --link: 96 165 250;
-  --link-hover: 59 130 246;
+  --link: 59 130 246;
+  --link-hover: 37 99 235;
 }
-
-
-
-
+:lang(AR) {
+  /* Arabic-specific styles */
+  body {
+    font-family: 'Cairo', sans-serif;
+    direction: rtl;
+  }
+}
+:lang(EN) {
+  /* English-specific styles */
+  body {
+    font-family: 'Inter', sans-serif;
+    direction: ltr;
+  }
+}
