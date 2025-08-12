@@ -40,7 +40,7 @@ const Links = () => {
 				</li>
 			))}
 			<li onClick={toggleTheme} className="cursor-pointer select-none">
-				{theme === "light" ? "🌞" : "🌜"}
+				{theme === "light" ? "🌜" : "🌞"}
 			</li>
 		</ul>
 	);

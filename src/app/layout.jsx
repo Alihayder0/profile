@@ -20,9 +20,14 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider>
+           <div className="min-h-screen flex flex-col">
+            
            <Navbar />
+          <div className="flex-grow container mx-auto px-4 py-8">
           {children}
+          </div>
           <Footer />
+          </div>
         </ThemeProvider>
       </body>
     </html>
