@@ -1,10 +1,24 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef, useEffect } from "react";
+import { useLanguage } from "./LanguageProvider";
 
 export default function ParticleLoading() {
+  const { lang } = useLanguage();
   const canvasRef = useRef(null);
   const mousePos = useRef({ x: null, y: null });
+
+  // النصوص باللغتين
+  const translations = {
+    EN: {
+      loading: "Loading...",
+    },
+    AR: {
+      loading: "جاري التحميل...",
+    },
+  };
+
+  const t = translations[lang] || translations.EN;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -30,76 +44,60 @@ export default function ParticleLoading() {
       }
 
       update() {
-        // الحركة العضوية (Wander Effect)
-        this.wander += (Math.random() - 0.5) * 0.2;
-        this.vx += Math.cos(this.wander) * 0.1;
-        this.vy += Math.sin(this.wander) * 0.1;
+        this.vx += (Math.random() - 0.5) * this.wander;
+        this.vy += (Math.random() - 0.5) * this.wander;
 
-        // تفاعل مع الماوس
-        if (mousePos.current.x !== null && mousePos.current.y !== null) {
-          const dx = this.x - mousePos.current.x;
-          const dy = this.y - mousePos.current.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          const minDist = 150;
+        this.vx = Math.max(-2, Math.min(2, this.vx));
+        this.vy = Math.max(-2, Math.min(2, this.vy));
 
-          if (dist < minDist) {
-            const force = (minDist - dist) / minDist;
-            const angle = Math.atan2(dy, dx);
-            this.vx += force * Math.cos(angle) * 1.2;
-            this.vy += force * Math.sin(angle) * 1.2;
-          }
-        }
-        
-        // --- تعديل: تمت زيادة قوة الجذب للمركز ---
-        const centerForce = 0.05; // كانت 0.005، زدناها لجذب أقوى
-        const dxToCenter = width / 2 - this.x;
-        const dyToCenter = height / 2 - this.y;
-
-        this.vx += dxToCenter * centerForce * 0.01;
-        this.vy += dyToCenter * centerForce * 0.01;
-
-
-        // تحديث الموقع بناءً على السرعة
         this.x += this.vx;
         this.y += this.vy;
 
-        // ارتداد الجسيمات عن الحواف
-        const margin = 5;
-        if (this.x < margin || this.x > width - margin) {
-          this.vx *= -0.5;
-          this.x = Math.max(margin, Math.min(width - margin, this.x));
+        if (this.x < 0 || this.x > width) {
+          this.vx *= -1;
+          this.x = Math.max(0, Math.min(width, this.x));
         }
-        if (this.y < margin || this.y > height - margin) {
-          this.vy *= -0.5;
-          this.y = Math.max(margin, Math.min(height - margin, this.y));
+        if (this.y < 0 || this.y > height) {
+          this.vy *= -1;
+          this.y = Math.max(0, Math.min(height, this.y));
         }
 
-        // تخفيف السرعة (احتكاك)
-        this.vx *= 0.98;
-        this.vy *= 0.98;
+        if (mousePos.current.x !== null && mousePos.current.y !== null) {
+          const dx = mousePos.current.x - this.x;
+          const dy = mousePos.current.y - this.y;
+          const distance = Math.hypot(dx, dy);
+
+          if (distance < 100) {
+            const force = (100 - distance) / 100;
+            this.vx += (dx / distance) * force * 0.5;
+            this.vy += (dy / distance) * force * 0.5;
+          }
+        }
       }
 
       draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+        ctx.fillStyle = `rgba(59, 130, 246, ${0.4 + Math.sin(Date.now() * 0.003 + this.x * 0.01) * 0.3})`;
         ctx.fill();
       }
     }
 
     function connectParticles(pulse) {
-      const maxDist = 80 + pulse * 60;
+      const maxDist = 60 + pulse * 40;
 
       for (let a = 0; a < particles.length; a++) {
         for (let b = a + 1; b < particles.length; b++) {
-          const dx = particles[a].x - particles[b].x;
-          const dy = particles[a].y - particles[b].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+          const dist = Math.hypot(
+            particles[a].x - particles[b].x,
+            particles[a].y - particles[b].y
+          );
 
           if (dist < maxDist) {
+            const opacity = (1 - dist / maxDist) * (0.2 + pulse * 0.3);
+            ctx.strokeStyle = `rgba(59, 130, 246, ${opacity})`;
+            ctx.lineWidth = 1 + pulse * 1.5;
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(255, 255, 255, ${1 - dist / maxDist})`;
-            ctx.lineWidth = 1;
             ctx.moveTo(particles[a].x, particles[a].y);
             ctx.lineTo(particles[b].x, particles[b].y);
             ctx.stroke();
@@ -153,13 +151,12 @@ export default function ParticleLoading() {
       particles.forEach((p) => {
         const dx = p.x - clickX;
         const dy = p.y - clickY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+        const distance = Math.hypot(dx, dy);
 
-        if (dist < blastRadius) {
-          const force = (blastRadius - dist) / blastRadius;
-          const angle = Math.atan2(dy, dx);
-          p.vx += Math.cos(angle) * force * 8;
-          p.vy += Math.sin(angle) * force * 8;
+        if (distance < blastRadius) {
+          const force = (blastRadius - distance) / blastRadius;
+          p.vx += (dx / distance) * force * 8;
+          p.vy += (dy / distance) * force * 8;
         }
       });
     }
@@ -181,11 +178,21 @@ export default function ParticleLoading() {
   }, []);
 
   return (
-    <div className="relative w-full h-screen bg-gradient-to-br from-[#3f3251] via-[#002025] to-[#002025] flex items-center justify-center select-none overflow-hidden">
+    <div className="fixed inset-0 w-screen h-screen bg-gradient-to-br from-[#3f3251] via-[#002025] to-[#002025] flex items-center justify-center select-none overflow-hidden z-50">
       <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full" />
-      <div className="relative z-10 flex flex-col items-center text-white space-y-4">
-        <div className="loader-circle border-4 border-t-transparent border-white rounded-full w-16 h-16 animate-spin"></div>
-        <p className="text-xl font-semibold tracking-wide">جاري التحميل...</p>
+      <div className="relative z-10 flex flex-col items-center text-white space-y-8">
+        <div className="relative">
+          <div className="loader-circle border-8 border-t-transparent border-white rounded-full w-20 h-20 animate-spin"></div>
+          <div className="absolute inset-0 border-8 border-blue-500/20 rounded-full animate-pulse"></div>
+        </div>
+        <div className="text-center space-y-4">
+          <p className="text-2xl font-medium tracking-wide">{t.loading}</p>
+          <div className="flex justify-center space-x-2">
+            <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+            <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+            <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+          </div>
+        </div>
       </div>
     </div>
   );

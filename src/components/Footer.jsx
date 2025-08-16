@@ -20,6 +20,8 @@ const Footer = () => {
     }
   };
 
+  const t = translations[lang] || translations.EN;
+
   return (
     <footer className="bg-background border-t-2 border-border">
       <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 px-6 py-8"
@@ -27,7 +29,7 @@ const Footer = () => {
       >
         {/* نص الحقوق */}
         <div className="text-sm text-foreground/80 text-center sm:text-left">
-          {translations[lang]?.copyright}
+          {t.copyright}
         </div>
 
         {/* أيقونات السوشيال */}

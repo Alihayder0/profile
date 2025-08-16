@@ -3,13 +3,19 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 const LanguageContext = createContext();
 
-export function LanguageProvider({ children }) {
-  const [lang, setLang] = useState("");
+export function LanguageProvider({ children, initialLang = "EN" }) {
+  const [lang, setLang] = useState(initialLang);
 
   useEffect(() => {
     const storedLang = localStorage.getItem("language");
     if (storedLang) {
       setLang(storedLang);
+      // تحديث خصائص HTML عند التحميل
+      document.documentElement.lang = storedLang === "EN" ? "en" : "ar";
+      document.documentElement.dir = storedLang === "EN" ? "ltr" : "rtl";
+      document.documentElement.className = document.documentElement.className
+        .replace(/\blang-\w+\b/g, '')
+        .trim() + ` lang-${storedLang.toLowerCase()}`;
     }
   }, []);
 
@@ -18,8 +24,14 @@ export function LanguageProvider({ children }) {
     setLang(newLang);
     localStorage.setItem("language", newLang);
     
-     document.documentElement.lang = newLang === "EN" ? "en" : "ar";
-        document.documentElement.dir = newLang === "EN" ? "ltr" : "rtl";
+    // تحديث خصائص HTML للاتجاه واللغة
+    document.documentElement.lang = newLang === "EN" ? "en" : "ar";
+    document.documentElement.dir = newLang === "EN" ? "ltr" : "rtl";
+    
+    // إضافة كلاس CSS للغة
+    document.documentElement.className = document.documentElement.className
+      .replace(/\blang-\w+\b/g, '')
+      .trim() + ` lang-${newLang.toLowerCase()}`;
   };
 
   return (

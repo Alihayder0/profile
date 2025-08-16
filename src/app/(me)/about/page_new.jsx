@@ -138,7 +138,7 @@ export default function About() {
     };
 
     return (
-        <div className="bg-background min-h-screen py-12 px-4" style={{ direction: lang === "AR" ? "rtl" : "ltr" }}>
+        <div className="bg-background min-h-screen py-12 px-4">
             <motion.div
                 className="max-w-4xl mx-auto space-y-12"
                 variants={containerVariants}
